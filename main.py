@@ -69,11 +69,19 @@ def cluster_the_data(data):
 	centroids, labels = kmeans2(data=data, k=2)
 	return centroids, labels
 
-points = createData()
-centroids, labels = cluster_the_data(points)
-colors = ["#0000FF", "#FF0000"]
-figure, axis = plt.subplots()
-# add the event listener for a button press
-figure.canvas.mpl_connect('button_press_event', onclick)
-# scatter the points on the plot
-plot(points, centroids, labels, colors)
+def main():
+	# generate the data
+	points = createData()
+	# Cluster the data and such.
+	centroids, labels = cluster_the_data(points)
+	# Colors per each grouping.
+	colors = ["#0000FF", "#FF0000"]
+	# Create the plot and the axis for it.
+	figure, axis = plt.subplots()
+	# add the event listener for a button press
+	figure.canvas.mpl_connect('button_press_event', onclick)
+	# scatter the points on the plot
+	plot(points, centroids, labels, colors)
+
+if __name__ == "__main__":
+	main()
