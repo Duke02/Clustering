@@ -2,11 +2,12 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.cluster.vq import kmeans2
+import copy
 
-def createData():
+# returns in size of (2*N, 2)
+def createData(N = 100):
 	# Equal to N in other comments.
-	num_of_samples = 100
+	num_of_samples = N
 	# offsets are added together to make them more dramatic, but not
 	# too much, such as if added 1 to each.
 	offset = np.random.rand(2, num_of_samples) + np.random.rand(2, num_of_samples)
@@ -23,9 +24,9 @@ def createData():
 	# reshape the output arrays to a (2, N)
 	# If you get an error here, that's because you're concatting
 	# somewhere you should be adding. Or something similar.
-	points = np.reshape(points, (2, num_of_samples))
-	opp_points = np.reshape(opp_points, (2, num_of_samples))
-	return np.concatenate((points, opp_points), axis=1).T
+	points = np.reshape(points, (num_of_samples, 2))
+	opp_points = np.reshape(opp_points, (num_of_samples, 2))
+	return np.concatenate((points, opp_points), axis=0)
 
 # Adding centroids allows for plotting the centers of the data
 # Adding labels and colors allows for coloring of the different
@@ -43,7 +44,7 @@ def plot(data, centroids=[], labels=[], colors=[]):
 		_labels = labels
 	for i in range(len(data)):
 		# scatter the points
-		plt.scatter(data[i,0], data[i,1], c=_colors[_labels[i]])
+		plt.scatter(data[i,0], data[i,1], c=_colors[int(_labels[i])])
 	for centroid in centroids:
 		plt.scatter(centroid[0], centroid[1], marker='*', c="#000000", s=100)
 	# show the plot
@@ -65,8 +66,40 @@ def onclick(event):
 		# plot that data
 		plot(data, centroids, labels, colors)
 
+def distance(pt1, pt2, axis=1):
+	return np.linalg.norm(pt2-pt1, axis=axis)
+
+def kmeans(k, data):
+	# The first randomly selected centroid
+	centroid_x = np.random.choice(data[:,0], size=k)
+	centroid_y = np.random.choice(data[:,1], size=k)
+	centroid = np.array((centroid_x, centroid_y))
+
+	num_of_samples = len(data[:,0])
+	# Store the previous centroids
+	old_centroid = np.zeros(centroid.shape)
+	# Cluster labels (1D array)
+	clusters = np.zeros(num_of_samples)
+	# The distance between new and old centroid
+	dist = distance(centroid, old_centroid, axis=None)
+
+	# Loop until the distance is zero
+	while dist != 0:
+		# assign each value to its closest cluster...
+		for i in range(num_of_samples):
+			distances = distance(data[i], centroid)
+			clusters[i] = np.argmin(distances)
+		# Store the previous centroid
+		old_centroid = copy.deepcopy(centroid)
+		# finding the new centroid by taking the average value.
+		for i in range(k):
+			centroid[i] = np.mean([data[j] for j in range(num_of_samples) if clusters[j] == i], axis=0)
+		dist = distance(centroid, old_centroid, None)
+	return centroid, clusters
+
+
 def cluster_the_data(data):
-	centroids, labels = kmeans2(data=data, k=2)
+	centroids, labels = kmeans(k=2, data=data)
 	return centroids, labels
 
 def main():
