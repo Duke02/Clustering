@@ -4,7 +4,7 @@ according to their position in a graph.
 
 ## Requirements
 The project was built using packages installed from 
-[Anaconda 4.5.11](https://www.anaconda.com/download/#linux). The 
+[Anaconda 4.5.11](https://www.anaconda.com/download). The 
 packages that were used can be found in `requirements.txt`.
 
 ## To-do
