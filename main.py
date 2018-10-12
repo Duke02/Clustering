@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import copy
 
+
+def get_k():
+	return int(input("How many clusters do you want?"))
+
+if __name__ == "__main__":
+	num_of_clusters = get_k()
+
 # returns in size of (2*N, 2)
 def createData(N = 100):
 	# Equal to N in other comments.
@@ -69,9 +76,9 @@ def onclick(event):
 		# recreate new data
 		data = createData()
 		# Cluster data again.
-		centroids, labels = cluster_the_data(data)
+		centroids, labels = cluster_the_data(data, k = num_of_clusters)
 		# Pretty Colors
-		colors = get_random_colors(2)
+		colors = get_random_colors(n = num_of_clusters)
 		# plot that data
 		plot(data, centroids, labels, colors)
 
@@ -79,11 +86,11 @@ def distance(pt1, pt2, axis=1):
 	# The usual distance formula.
 	return np.linalg.norm(pt2-pt1, axis=axis)
 
-def kmeans(k, data):
+def kmeans(k, data, redo=False):
 	# The first randomly selected centroid
 	centroid_x = np.random.choice(data[:,0], size=k)
 	centroid_y = np.random.choice(data[:,1], size=k)
-	centroid = np.array((centroid_x, centroid_y))
+	centroid = np.array((centroid_x, centroid_y)).T
 
 	# Just to make things more readable
 	num_of_samples = len(data[:,0])
@@ -109,7 +116,19 @@ def kmeans(k, data):
 		# average value of our data if we're at the
 		# right cluster
 		for i in range(k):
-			centroid[i] = np.mean([data[j] for j in range(num_of_samples) if clusters[j] == i], axis=0)
+			currData = [data[j] for j in range(num_of_samples) if clusters[j] == i]
+			# If we ever get empty data (which is apparently a problem)
+			# we rerun the function.
+			# if we rerun the program we get clusters
+			# that are too close to each other, which
+			# is not what we want.
+			# TODO: Remove hacky code.
+			if len(currData) == 0:
+				if not redo:
+					return kmeans(k=k, data=data, redo=True)
+				else:
+					return centroid, clusters
+			centroid[i] = np.mean(currData, axis=0)
 		# Did it change?
 		dist = distance(centroid, old_centroid, None)
 	# return the centroids and labels for our data
@@ -139,9 +158,9 @@ def main():
 	# generate the data
 	points = createData()
 	# Cluster the data and such.
-	centroids, labels = cluster_the_data(points)
+	centroids, labels = cluster_the_data(points, k = num_of_clusters)
 	# Colors per each grouping.
-	colors = get_random_colors(2)
+	colors = get_random_colors(n = num_of_clusters)
 	# Create the plot and the axis for it.
 	figure, axis = plt.subplots()
 	# add the event listener for a button press
