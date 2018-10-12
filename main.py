@@ -37,14 +37,14 @@ def plot(data, centroids=[], labels=[], colors=[]):
 	# clear the current frame
 	plt.clf()
 	if len(labels) == 0 or len(colors) == 0:
-		_colors = ["#999999"]
+		_colors = [["#999999"]]
 		_labels = [0 for x in range(len(data))]
 	else:
 		_colors = colors
 		_labels = labels
 	for i in range(len(data)):
 		# scatter the points
-		plt.scatter(data[i,0], data[i,1], c=_colors[int(_labels[i])])
+		plt.scatter(data[i,0], data[i,1], c=_colors[:,int(_labels[i])])
 	for centroid in centroids:
 		plt.scatter(centroid[0], centroid[1], marker='*', c="#000000", s=100)
 	# show the plot
@@ -62,7 +62,7 @@ def onclick(event):
 		# Cluster data again.
 		centroids, labels = cluster_the_data(data)
 		# Pretty Colors
-		colors = ["#0000FF", "#FF0000"]
+		colors = get_random_colors(2)
 		# plot that data
 		plot(data, centroids, labels, colors)
 
@@ -98,9 +98,15 @@ def kmeans(k, data):
 	return centroid, clusters
 
 
-def cluster_the_data(data):
-	centroids, labels = kmeans(k=2, data=data)
+def cluster_the_data(data, k=2):
+	centroids, labels = kmeans(k=k, data=data)
 	return centroids, labels
+
+def get_random_colors(n):
+	colors = np.zeros((1, n, 3))
+	for c in range(n):
+		colors[0, c] += (np.random.rand(), np.random.rand(), np.random.rand())
+	return colors.clip(min=0x111111 / 0xFFFFFF, max = 0xCCCCCC / 0xFFFFFF)
 
 def main():
 	# generate the data
@@ -108,7 +114,7 @@ def main():
 	# Cluster the data and such.
 	centroids, labels = cluster_the_data(points)
 	# Colors per each grouping.
-	colors = ["#0000FF", "#FF0000"]
+	colors = get_random_colors(2)
 	# Create the plot and the axis for it.
 	figure, axis = plt.subplots()
 	# add the event listener for a button press
