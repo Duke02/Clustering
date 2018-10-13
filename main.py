@@ -88,8 +88,11 @@ def distance(pt1, pt2, axis=1):
 
 def kmeans(k, data, redo=False):
 	# The first randomly selected centroid
-	centroid_x = np.random.choice(data[:,0], size=k)
-	centroid_y = np.random.choice(data[:,1], size=k)
+	centroid_x = np.random.randint(np.min(data[:,0]), np.max(data[:,0]), size=k)
+	centroid_y = np.random.randint(np.min(data[:,1]), np.max(data[:, 1]), size=k)
+	# Centroid is in the format of (k, d)
+	# where d is the number of dimensions
+	# and k is the number of clusters.
 	centroid = np.array((centroid_x, centroid_y)).T
 
 	# Just to make things more readable
@@ -107,15 +110,22 @@ def kmeans(k, data, redo=False):
 		for i in range(num_of_samples):
 			# Get our distances for the current centroid
 			# and data.
+			# This is with axis = 1, meaning we look
+			# at the (x,y) coords of all the samples
 			distances = distance(data[i], centroid)
-			# get the indexes of the the least distances
-			clusters[i] = np.argmin(distances)
+			# get the index of the centroid that
+			# has the least distance from the current
+			# data.
+			cluster = np.argmin(distances)
+			clusters[i] = cluster
 		# Store the previous centroid
 		old_centroid = copy.deepcopy(centroid)
 		# finding the new centroid by taking the
 		# average value of our data if we're at the
 		# right cluster
 		for i in range(k):
+			# Get every piece of data that is in the
+			# current cluster.
 			currData = [data[j] for j in range(num_of_samples) if clusters[j] == i]
 			# If we ever get empty data (which is apparently a problem)
 			# we rerun the function.
@@ -123,11 +133,15 @@ def kmeans(k, data, redo=False):
 			# that are too close to each other, which
 			# is not what we want.
 			# TODO: Remove hacky code.
+			# This bug is apparently coming from
+			# our clusters not having a certain number
+			# that is in range(k)
 			if len(currData) == 0:
 				if not redo:
-					return kmeans(k=k, data=data, redo=True)
+					return kmeans(k = k, data = data, redo = True)
 				else:
 					return centroid, clusters
+			# Get the average of the current cluster.
 			centroid[i] = np.mean(currData, axis=0)
 		# Did it change?
 		dist = distance(centroid, old_centroid, None)
