@@ -87,13 +87,9 @@ def distance(pt1, pt2, axis=1):
 	return np.linalg.norm(pt2-pt1, axis=axis)
 
 def kmeans(k, data, redo=False):
-	# The first randomly selected centroid
-	centroid_x = np.random.randint(np.min(data[:,0]), np.max(data[:,0]), size=k)
-	centroid_y = np.random.randint(np.min(data[:,1]), np.max(data[:, 1]), size=k)
-	# Centroid is in the format of (k, d)
-	# where d is the number of dimensions
-	# and k is the number of clusters.
-	centroid = np.array((centroid_x, centroid_y)).T
+	# Pick the first k data points and
+	# use those as our initial centroids.
+	centroid = data[:k]
 
 	# Just to make things more readable
 	num_of_samples = len(data[:,0])
