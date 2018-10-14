@@ -86,6 +86,12 @@ def distance(pt1, pt2, axis=1):
 	# The usual distance formula.
 	return np.linalg.norm(pt2-pt1, axis=axis)
 
+# The inertia is the sum of all the distances of
+# each cluster's data points from their respective
+# centroid.
+def get_inertia(data, centroids, clusters):
+	return np.sum([distance(data[j], centroids[int(clusters[j])], axis=0) for j in range(data.shape[0])])
+
 def kmeans(k, data, redo=False):
 	# Pick the first k data points and
 	# use those as our initial centroids.
@@ -123,33 +129,34 @@ def kmeans(k, data, redo=False):
 			# Get every piece of data that is in the
 			# current cluster.
 			currData = [data[j] for j in range(num_of_samples) if clusters[j] == i]
-			# If we ever get empty data (which is apparently a problem)
-			# we rerun the function.
-			# if we rerun the program we get clusters
-			# that are too close to each other, which
-			# is not what we want.
-			# TODO: Remove hacky code.
-			# This bug is apparently coming from
-			# our clusters not having a certain number
-			# that is in range(k)
-			if len(currData) == 0:
-				if not redo:
-					return kmeans(k = k, data = data, redo = True)
-				else:
-					return centroid, clusters
 			# Get the average of the current cluster.
 			centroid[i] = np.mean(currData, axis=0)
 		# Did it change?
 		dist = distance(centroid, old_centroid, None)
 	# return the centroids and labels for our data
-	return centroid, clusters
+	return centroid, clusters, get_inertia(data=data, centroids=centroid, clusters=clusters)
 
 
-# Basically just a wrapper function around our version
-# of kmeans so that we don't have to change a lot of code.
-def cluster_the_data(data, k=2):
-	centroids, labels = kmeans(k=k, data=data)
-	return centroids, labels
+# A function that runs n_trials number of trials of the kmeans algorithm
+# to find the best clustering of the data.
+# This is similar to scikit's kmeans algorithm, with
+# n_trials being our version of n_init.
+def cluster_the_data(data, k=2, n_trials=10):
+	best_centroid = None
+	best_label = None
+	best_inertia = None
+	# For all of our tests
+	for trial in range(n_trials):
+		# Get our current clusters and other data
+		curr_centroid, curr_label, curr_inertia = kmeans(k=k, data=data)
+		# If we don't have any clusters or we have better clusters
+		if best_inertia is None or curr_inertia < best_inertia:
+			# Set the data accordingly.
+			best_centroid = curr_centroid
+			best_label = curr_label
+			best_inertia = curr_inertia
+	# return our best clusters.
+	return best_centroid, best_label
 
 # Get n random colors.
 # We generally use this to color our clusters differently from
