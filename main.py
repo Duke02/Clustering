@@ -40,7 +40,7 @@ def createData(N = 100):
 # groups of data.
 # len(colors) must equal the number of clusters, or the k used
 # in the k-means algorithm.
-def plot(data, centroids=[], labels=[], colors=[]):
+def plot(data, centroids=[], labels=[], colors=[], covariance=[]):
 	# clear the current frame
 	plt.clf()
 	# If we weren't given any labels or colors
@@ -63,6 +63,8 @@ def plot(data, centroids=[], labels=[], colors=[]):
 	# Plot our centroids as a black star.
 	for centroid in centroids:
 		plt.scatter(centroid[0], centroid[1], marker='*', c="#000000", s=100)
+	for cov in covariance:
+		plt.scatter(cov[0], cov[1], c="#AA00AA")
 	# show the plot
 	plt.show()
 	# redraw the plot
@@ -79,8 +81,13 @@ def onclick(event):
 		centroids, labels = cluster_the_data(data, k = num_of_clusters)
 		# Pretty Colors
 		colors = get_random_colors(n = num_of_clusters)
+		# Separate the data into their actual clusters.
+		clusters = make_clusters(data, labels, num_of_clusters)
+		# Get the uncertainty matrix per each cluster, per each dimension.
+		uncertainty_matrix = get_uncertainty_matrix(data)
 		# plot that data
 		plot(data, centroids, labels, colors)
+
 
 def distance(pt1, pt2, axis=1):
 	# The usual distance formula.
@@ -190,8 +197,12 @@ def make_clusters(data, labels, k):
 	return clusters
 
 # Gets the uncertainty matrix of the clusters
+# Returns a matrix of size [k, ...]
 def get_uncertainty_matrix(clusters):
-	pass
+	uncertainty_matrix = np.zeros((clusters.shape[0], 2, 2))
+	for i in range(clusters.shape[0]):
+		uncertainty_matrix[i] += np.cov(clusters[i], rowvar = False)
+	return uncertainty_matrix
 
 def main():
 	# generate the data
@@ -205,10 +216,9 @@ def main():
 	# add the event listener for a button press
 	figure.canvas.mpl_connect('button_press_event', onclick)
 	# scatter the points on the plot
-	# plot(points, centroids, labels, colors)
+	plot(points, centroids, labels, colors)
 	# organize the data into their clusters
 	clusters = make_clusters(points, labels, num_of_clusters)
-	print(clusters)
 
 if __name__ == "__main__":
 	main()
