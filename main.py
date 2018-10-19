@@ -178,6 +178,21 @@ def get_random_colors(n):
 	# but differ enough from the centroid plots.
 	return colors.clip(min=0x111111 / 0xFFFFFF, max = 0xCCCCCC / 0xFFFFFF)
 
+# Groups data into an array (size: [k, N, 2] N = number of samples) based on labels.
+# data is an array of size [N, 2]
+# labels is an array of size [N,]
+# Remember that some of the values in the returned array will be solely 0's
+# so ensure that those are not factored into your calculations.
+def make_clusters(data, labels, k):
+	clusters = np.zeros((k, len(labels), 2))
+	for i in range(len(labels)):
+		clusters[int(labels[i]),i] += data[i]
+	return clusters
+
+# Gets the uncertainty matrix of the clusters
+def get_uncertainty_matrix(clusters):
+	pass
+
 def main():
 	# generate the data
 	points = createData()
@@ -190,7 +205,10 @@ def main():
 	# add the event listener for a button press
 	figure.canvas.mpl_connect('button_press_event', onclick)
 	# scatter the points on the plot
-	plot(points, centroids, labels, colors)
+	# plot(points, centroids, labels, colors)
+	# organize the data into their clusters
+	clusters = make_clusters(points, labels, num_of_clusters)
+	print(clusters)
 
 if __name__ == "__main__":
 	main()
