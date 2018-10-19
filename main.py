@@ -165,7 +165,10 @@ def cluster_the_data(data, k=2, n_trials=10):
 def get_random_colors(n):
 	colors = np.zeros((1, n, 3))
 	for c in range(n):
-		colors[0, c] += (np.random.rand(), np.random.rand(), np.random.rand())
+		new_color = np.random.random(size = 3) # (np.random.rand(), np.random.rand(), np.random.rand())
+		while True in np.isclose(new_color, colors[0], rtol = 0x111111 / 0xFFFFFF, atol = 0 ):
+			new_color = np.random.random(size = 3)
+		colors[0, c] += new_color
 	# Clip the colors between #111111 (dark gray) and #CCCCCC (light-ish gray)
 	# this is so that the colors are still visible on the graph
 	# but differ enough from the centroid plots.
