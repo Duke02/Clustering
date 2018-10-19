@@ -10,4 +10,3 @@ packages that were used can be found in `requirements.txt`.
 ## To-do
 * Add uncertainty matrix and plot that
   * This needs to be per cluster.
-* Add user defined number of clusters
