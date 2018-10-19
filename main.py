@@ -161,13 +161,17 @@ def cluster_the_data(data, k=2, n_trials=10):
 # Get n random colors.
 # We generally use this to color our clusters differently from
 # each other.
-# TODO: Force the colors to be different.
 def get_random_colors(n):
 	colors = np.zeros((1, n, 3))
 	for c in range(n):
-		new_color = np.random.random(size = 3) # (np.random.rand(), np.random.rand(), np.random.rand())
+		# Generate a 3, ndarray of random elements.
+		new_color = np.random.random(size = 3)
+		# If the new color is similar to any of the already existing colors...
 		while True in np.isclose(new_color, colors[0], rtol = 0x111111 / 0xFFFFFF, atol = 0 ):
+			# Generate a new color to test on and keep going.
 			new_color = np.random.random(size = 3)
+		# Add the current new color to the existing colors.
+		# Literally add it cuz they're already zeros.
 		colors[0, c] += new_color
 	# Clip the colors between #111111 (dark gray) and #CCCCCC (light-ish gray)
 	# this is so that the colors are still visible on the graph
