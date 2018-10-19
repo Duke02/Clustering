@@ -6,7 +6,7 @@ import copy
 
 
 def get_k():
-	return int(input("How many clusters do you want?"))
+	return int(input("How many clusters do you want? "))
 
 if __name__ == "__main__":
 	num_of_clusters = get_k()
